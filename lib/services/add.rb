@@ -24,8 +24,9 @@ class YandexDirect::Add
     if params.kind_of?(Array)
       batch_add(params)
     else
-      special_parameters = params.new_text_add_parameters if params.type == "TEXT_AD"
-      params.id = @client.request(SERVICE, 'add', {"Ads": [params.add_parameters(special_parameters)]})["AddResults"].first["Id"]
+      params['type'] ||= 'TextAd'
+      parameters = add_parameters(params)
+      params.id = @client.request(SERVICE, 'add', {"Ads": [parameters]})["AddResults"].first["Id"]
       params
     end
   end
@@ -34,8 +35,9 @@ class YandexDirect::Add
     if params.kind_of?(Array)
       batch_update(params)
     else
-      special_parameters = params.text_add_parameters if params.type == "TEXT_AD"
-      params.id = @client.request(SERVICE, 'update', {"Ads": [params.update_parameters(special_parameters)]})["UpdateResults"].first["Id"]
+      params['type'] ||= 'TextAd'
+      parameters = add_parameters(params)
+      params.id = @client.request(SERVICE, 'update', {"Ads": [parameters]})["UpdateResults"].first["Id"]
       params
     end
   end
@@ -70,10 +72,9 @@ class YandexDirect::Add
     action('delete', ids)
   end
 
-  def add_parameters(add_type)
-    hash = {"AdGroupId": @ad_group_id}
-    hash[add_type.first] = add_type.last
-    hash
+  def add_parameters(params)
+    type = params.delete('type')
+    {type => params}
   end
 
   def update_parameters(add_type)
@@ -112,22 +113,22 @@ class YandexDirect::Add
   private
 
   def batch_update(adds)
-    params = adds.map do |add|
-      special_parameters = add.text_add_parameters if add.type == "TEXT_AD"
-      add.update_parameters(special_parameters)
+    params = adds.map do |params|
+      params['type'] ||= 'TextAd'
+      add_parameters(params)
     end
-    params.each_slice(100) do |add_parameters|
-      @client.request(SERVICE, 'update', {"Ads": add_parameters.compact})["UpdateResults"]
+    params.each_slice(100) do |ads_parameters|
+      @client.request(SERVICE, 'update', {"Ads": ads_parameters.compact})["UpdateResults"]
     end
   end
 
   def batch_add(adds)
     params = adds.map do |add|
-      special_parameters = add.new_text_add_parameters if add.type == "TEXT_AD"
-      add.add_parameters(special_parameters)
+      params['type'] ||= 'TextAd'
+      add_parameters(params)
     end
-    params.each_slice(100) do |add_parameters|
-      @client.request(SERVICE, 'add', {"Ads": add_parameters.compact})["AddResults"]
+    params.each_slice(100) do |ads_parameters|
+      @client.request(SERVICE, 'add', {"Ads": ads_parameters.compact})["AddResults"]
     end
   end
 
