@@ -3,27 +3,8 @@ class YandexDirect::Add
   attr_accessor :ad_group_id, :campaign_id, :id, :status, :state, :type, :status_clarification, :text, :title, :href, 
                 :display_url_path, :ad_image_hash, :extension_ids, :mobile, :v_card_id, :sitelink_set_id
 
-  def initialize(@client, params = {})
-    @ad_group_id = params[:ad_group_id]
-    @id = params[:id]
-    @status = params[:status]
-    @campaign_id = params[:campaign_id]
-    @negative_keywords = params[:negative_keywords]
-    @utm_tags = params[:utm_tags]
-    @state = params[:state]
-    @type = params[:type] || "TEXT_AD"
-    @status_clarification = params[:status_clarification]
-    @text = params[:text]
-    @title = params[:title]
-    @href = params[:href]
-    @display_url_path = params[:display_url_path]
-    @ad_image_hash = params[:ad_image_hash]
-    @extension_ids = params[:extension_ids]
-    @mobile = params[:mobile]
-    @v_card_id = params[:v_card_id]
-    @extension_ids = params[:extension_ids]
-    @mobile = params[:mobile]
-    @sitelink_set_id = params[:sitelink_set_id]
+  def initialize(client)
+    @client = client
   end
 
   def list(params)
@@ -36,9 +17,7 @@ class YandexDirect::Add
       "FieldNames": ['AdGroupId', 'CampaignId', 'State', 'Status', 'StatusClarification', 'Type', 'Id'],
       "TextAdFieldNames": ['SitelinkSetId', 'Text', 'Title', 'Href']
     })["Ads"]
-    (ads || []).map{|c| new({ ad_group_id: c["AdGroupId"], id: c["Id"], status: c["Status"], campaign_id: c["CampaignId"], 
-                              state: c["State"], type: c["Type"], status_clarification: c["StatusClarification"], 
-                              sitelink_set_id: c["TextAd"]["SitelinkSetId"], text: c["TextAd"]["Text"], title: c["TextAd"]["Title"], href: c["TextAd"]["Href"]})}
+    ads || []
   end
 
   def add(params)

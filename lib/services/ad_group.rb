@@ -2,14 +2,8 @@ class YandexDirect::AdGroup
   SERVICE = 'adgroups'
   attr_accessor :name, :campaign_id, :id, :status, :region_ids, :negative_keywords, :tracking_params
 
-  def initialize(@client, params = {})
-    @name = params[:name]
-    @id = params[:id]
-    @status = params[:status]
-    @campaign_id = params[:campaign_id]
-    @region_ids = params[:region_ids]
-    @negative_keywords = {"Items": params[:negative_keywords]} if params[:negative_keywords].present?
-    @tracking_params = params[:tracking_params]
+  def initialize(client)
+    @client = client
   end
 
   def list(params)
@@ -20,8 +14,7 @@ class YandexDirect::AdGroup
       "SelectionCriteria": selection_criteria,
       "FieldNames": ['Id', 'Name', 'CampaignId', 'Status', 'RegionIds', 'TrackingParams', 'NegativeKeywords']
     })["AdGroups"]
-    (ad_groups || []).map{|c| new({ name: c["Name"], id: c["Id"], status: c["Status"], campaign_id: c["CampaignId"], 
-                                    region_ids: c["RegionIds"], tracking_params: c["TrackingParams"], negative_keywords: c["NegativeKeywords"]})}
+    ad_groups || []
   end
 
   def add(params)

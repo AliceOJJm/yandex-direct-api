@@ -4,27 +4,8 @@ class YandexDirect::Campaign
                 :search_strategy, :network_strategy, :limit_percent, :bid_percent, :end_date, :daily_budget_amount,
                 :daily_budget_mode, :blocked_ips, :excluded_sites, :type, :target_hours
 
-  def initialize(@client, params = {})
-    @name = params[:name]
-    @id = params[:id]
-    @status = params[:status]
-    @state = params[:state]
-    @start_date = params[:start_date]
-    @time_zone = params[:time_zone]
-    @negative_keywords = {"Items": params[:negative_keywords]} if params[:negative_keywords].present?
-    @email = params[:email]
-    @owner_name = params[:owner_name]
-    @limit_percent = params[:limit_percent]
-    @bid_percent = params[:bid_percent]
-    @end_date = params[:end_date]
-    @daily_budget_amount = params[:daily_budget_amount]
-    @daily_budget_mode = params[:daily_budget_mode]
-    @blocked_ips = params[:blocked_ips]
-    @excluded_sites = params[:excluded_sites]
-    @search_strategy = params[:search_strategy]
-    @network_strategy = params[:network_strategy]
-    @target_hours = params[:target_hours]
-    @type == params[:type] || "TEXT_CAMPAIGN"
+  def initialize(client)
+    @client = client
   end
 
   def list
@@ -36,10 +17,7 @@ class YandexDirect::Campaign
       },
       "FieldNames": ['Id', 'Name', 'State', 'Status', 'TimeTargeting', 'NegativeKeywords', 'ClientInfo', 'Type'],
       "TextCampaignFieldNames": ["BiddingStrategy"]
-    })["Campaigns"].map{|c| new({ name: c["Name"], id: c["Id"], status: c["Status"], state: c["State"], type: c["Type"],
-                                  target_hours: c["TimeTargeting"]["Schedule"]["Items"], owner_name: c["ClientInfo"],
-                                  negative_keywords: (c["NegativeKeywords"].present? ? c["NegativeKeywords"]["Items"] : nil), search_strategy: c["TextCampaign"]["BiddingStrategy"]["Search"]["BiddingStrategyType"], 
-                                  network_strategy: c["TextCampaign"]["BiddingStrategy"]["Network"]["BiddingStrategyType"]})}
+    })["Campaigns"]
   end
 
   def add(params)
