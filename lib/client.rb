@@ -7,7 +7,8 @@ require 'uri'
 class YandexDirect::Client
   attr_reader :ad_groups, :ads, :bids, :campaigns, :dictionaries, :keywords, :sitelinks, :vcards
 
-  def initialize(@configuration)
+  def initialize(configuration)
+    @configuration = configuration
     ad_groups = AdGroup.new(self)
     ads = Add.new(self)
     bids = Bid.new(self)
