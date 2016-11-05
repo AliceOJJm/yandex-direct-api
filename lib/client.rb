@@ -9,14 +9,14 @@ class YandexDirect::Client
 
   def initialize(configuration)
     @configuration = configuration
-    ad_groups = AdGroup.new(self)
-    ads = Add.new(self)
-    bids = Bid.new(self)
-    campaigns = Campaign.new(self)
-    dictionaries = Dictionarie.new(self)
-    keywords = Keyword.new(self)
-    sitelinks = Sitelink.new(self)
-    vcards = VCard.new(self)
+    ad_groups = YandexDirect::AdGroup.new(self)
+    ads = YandexDirect::Add.new(self)
+    bids = YandexDirect::Bid.new(self)
+    campaigns = YandexDirect::Campaign.new(self)
+    dictionaries = YandexDirect::Dictionaries.new(self)
+    keywords = YandexDirect::Keyword.new(self)
+    sitelinks = YandexDirect::Sitelink.new(self)
+    vcards = YandexDirect::VCard.new(self)
   end
 
   def request *args
