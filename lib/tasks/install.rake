@@ -10,7 +10,7 @@ namespace :yandex_direct_api do
       config.write(settings.to_yaml)
     end
     File.open(Rails.root.join('config', 'initializers', 'yandex_direct_api.rb'), 'w') do |config| 
-      config.write "require 'yandex_direct_api'\nYandexDirect.load File.join(Rails.root, 'config','yandex_direct_api.yml'), Rails.env"
+      config.write "require 'yandex-direct-api'\nYandexDirect.load File.join(Rails.root, 'config','yandex_direct_api.yml'), Rails.env"
     end
   end
 end
