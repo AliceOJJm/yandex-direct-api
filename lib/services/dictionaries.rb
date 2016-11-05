@@ -1,4 +1,4 @@
-module YandexDirect::Dictionaries
+class YandexDirect::Dictionaries
   SERVICE = 'dictionaries'
 
   def initialize(client)
