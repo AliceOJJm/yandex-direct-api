@@ -1,7 +1,11 @@
 class YandexDirect::Bid
   SERVICE = 'bids'
 
-  def list(@client, params = {})
+  def initialize(client)
+    @client = client
+  end
+
+  def list(params = {})
     selection_criteria = {}
     selection_criteria["CampaignIds"] = params[:campaign_ids] if params[:campaign_ids].present?
     selection_criteria["Ids"] = params[:ids] if params[:ids].present?
