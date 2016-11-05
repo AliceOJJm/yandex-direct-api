@@ -4,7 +4,7 @@ class YandexDirect::Campaign
                 :search_strategy, :network_strategy, :limit_percent, :bid_percent, :end_date, :daily_budget_amount,
                 :daily_budget_mode, :blocked_ips, :excluded_sites, :type, :target_hours
 
-  def initialize(params)
+  def initialize(@client, params = {})
     @name = params[:name]
     @id = params[:id]
     @status = params[:status]
@@ -27,8 +27,8 @@ class YandexDirect::Campaign
     @type == params[:type] || "TEXT_CAMPAIGN"
   end
 
-  def self.list
-    YandexDirect.request(SERVICE, 'get', { 
+  def list
+    @client.request(SERVICE, 'get', { 
       "SelectionCriteria": {
         "Types": ["TEXT_CAMPAIGN"], 
         "States": ["OFF", "ON"], 
@@ -42,22 +42,22 @@ class YandexDirect::Campaign
                                   network_strategy: c["TextCampaign"]["BiddingStrategy"]["Network"]["BiddingStrategyType"]})}
   end
 
-  def self.add(params)
+  def add(params)
     if params.kind_of?(Array)
       batch_add(params)
     else
       special_parameters = params.text_campaign_parameters if  params.type.blank? || params.type == "TEXT_CAMPAIGN"
-      params.id = YandexDirect.request(SERVICE, 'add', {"Campaigns": [params.parameters(special_parameters)]})["AddResults"].first["Id"]
+      params.id = @client.request(SERVICE, 'add', {"Campaigns": [params.parameters(special_parameters)]})["AddResults"].first["Id"]
       params
     end
   end
 
-  def self.update(params)
+  def update(params)
     if params.kind_of?(Array)
       batch_update(params)
     else
       special_parameters = params.text_campaign_parameters if params.type.blank? || params.type == "TEXT_CAMPAIGN"
-      params.id = YandexDirect.request(SERVICE, 'update', {"Campaigns": [params.parameters(special_parameters)]})["UpdateResults"].first["Id"]
+      params.id = @client.request(SERVICE, 'update', {"Campaigns": [params.parameters(special_parameters)]})["UpdateResults"].first["Id"]
       params
     end
   end
@@ -116,25 +116,25 @@ class YandexDirect::Campaign
 
   private
 
-  def self.batch_add(campaigns)
+  def batch_add(campaigns)
     params = []
     campaigns.each do |campaign|
       special_parameters = campaign.text_campaign_parameters if campaign.type.blank? || campaign.type == "TEXT_CAMPAIGN"
       params.push(campaign.parameters(special_parameters))
     end
     params.each_slice(10) do |add_parameters|
-      YandexDirect.request(SERVICE, 'add', {"Campaigns": add_parameters.compact})["AddResults"].map{|r| r["Id"]}
+      @client.request(SERVICE, 'add', {"Campaigns": add_parameters.compact})["AddResults"].map{|r| r["Id"]}
     end
   end
 
-  def self.batch_update(campaigns)
+  def batch_update(campaigns)
     params = []
     campaigns.each do |campaign|
       special_parameters = campaign.text_campaign_parameters if campaign.type.blank? || campaign.type == "TEXT_CAMPAIGN"
       params.push(campaign.parameters(special_parameters))
     end
     params.each_slice(10) do |add_parameters|
-      YandexDirect.request(SERVICE, 'update', {"Campaigns": add_parameters.compact})["UpdateResults"].map{|r| r["Id"]}
+      @client.request(SERVICE, 'update', {"Campaigns": add_parameters.compact})["UpdateResults"].map{|r| r["Id"]}
     end
   end
 end

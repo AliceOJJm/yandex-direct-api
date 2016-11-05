@@ -3,7 +3,7 @@ class YandexDirect::Add
   attr_accessor :ad_group_id, :campaign_id, :id, :status, :state, :type, :status_clarification, :text, :title, :href, 
                 :display_url_path, :ad_image_hash, :extension_ids, :mobile, :v_card_id, :sitelink_set_id
 
-  def initialize(params)
+  def initialize(@client, params = {})
     @ad_group_id = params[:ad_group_id]
     @id = params[:id]
     @status = params[:status]
@@ -26,12 +26,12 @@ class YandexDirect::Add
     @sitelink_set_id = params[:sitelink_set_id]
   end
 
-  def self.list(params)
+  def list(params)
     selection_criteria = {"Types":  ["TEXT_AD"]}
     selection_criteria["CampaignIds"] = params[:campaign_ids] if params[:campaign_ids].present?
     selection_criteria["AdGroupIds"] = params[:ad_group_ids] if params[:ad_group_ids].present?
     selection_criteria["Ids"] = params[:ids] if params[:ids].present?
-    ads = YandexDirect.request(SERVICE, 'get', { 
+    ads = @client.request(SERVICE, 'get', { 
       "SelectionCriteria": selection_criteria,
       "FieldNames": ['AdGroupId', 'CampaignId', 'State', 'Status', 'StatusClarification', 'Type', 'Id'],
       "TextAdFieldNames": ['SitelinkSetId', 'Text', 'Title', 'Href']
@@ -41,52 +41,52 @@ class YandexDirect::Add
                               sitelink_set_id: c["TextAd"]["SitelinkSetId"], text: c["TextAd"]["Text"], title: c["TextAd"]["Title"], href: c["TextAd"]["Href"]})}
   end
 
-  def self.add(params)
+  def add(params)
     if params.kind_of?(Array)
       batch_add(params)
     else
       special_parameters = params.new_text_add_parameters if params.type == "TEXT_AD"
-      params.id = YandexDirect.request(SERVICE, 'add', {"Ads": [params.add_parameters(special_parameters)]})["AddResults"].first["Id"]
+      params.id = @client.request(SERVICE, 'add', {"Ads": [params.add_parameters(special_parameters)]})["AddResults"].first["Id"]
       params
     end
   end
 
-  def self.update(params)
+  def update(params)
     if params.kind_of?(Array)
       batch_update(params)
     else
       special_parameters = params.text_add_parameters if params.type == "TEXT_AD"
-      params.id = YandexDirect.request(SERVICE, 'update', {"Ads": [params.update_parameters(special_parameters)]})["UpdateResults"].first["Id"]
+      params.id = @client.request(SERVICE, 'update', {"Ads": [params.update_parameters(special_parameters)]})["UpdateResults"].first["Id"]
       params
     end
   end
 
-  def self.unarchive(ids)
+  def unarchive(ids)
     ids = [ids] unless ids.kind_of?(Array)
     action('unarchive', ids)
   end
 
-  def self.archive(ids)
+  def archive(ids)
     ids = [ids] unless ids.kind_of?(Array)
     action('archive', ids)
   end
 
-  def self.stop(ids)
+  def stop(ids)
     ids = [ids] unless ids.kind_of?(Array)
     action('suspend', ids)
   end
 
-  def self.resume(ids)
+  def resume(ids)
     ids = [ids] unless ids.kind_of?(Array)
     action('resume', ids)
   end
 
-  def self.moderate(ids)
+  def moderate(ids)
     ids = [ids] unless ids.kind_of?(Array)
     action('moderate', ids)
   end
 
-  def self.delete(ids)
+  def delete(ids)
     ids = [ids] unless ids.kind_of?(Array)
     action('delete', ids)
   end
@@ -132,28 +132,28 @@ class YandexDirect::Add
 
   private
 
-  def self.batch_update(adds)
+  def batch_update(adds)
     params = adds.map do |add|
       special_parameters = add.text_add_parameters if add.type == "TEXT_AD"
       add.update_parameters(special_parameters)
     end
     params.each_slice(100) do |add_parameters|
-      YandexDirect.request(SERVICE, 'update', {"Ads": add_parameters.compact})["UpdateResults"]
+      @client.request(SERVICE, 'update', {"Ads": add_parameters.compact})["UpdateResults"]
     end
   end
 
-  def self.batch_add(adds)
+  def batch_add(adds)
     params = adds.map do |add|
       special_parameters = add.new_text_add_parameters if add.type == "TEXT_AD"
       add.add_parameters(special_parameters)
     end
     params.each_slice(100) do |add_parameters|
-      YandexDirect.request(SERVICE, 'add', {"Ads": add_parameters.compact})["AddResults"]
+      @client.request(SERVICE, 'add', {"Ads": add_parameters.compact})["AddResults"]
     end
   end
 
-  def self.action(action_name, ids)
+  def action(action_name, ids)
     ids = ids.compact.reject{|id| id == 0}
-    YandexDirect.request(SERVICE, action_name, {"SelectionCriteria": {"Ids": ids}}) if ids.any?
+    @client.request(SERVICE, action_name, {"SelectionCriteria": {"Ids": ids}}) if ids.any?
   end
 end

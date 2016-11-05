@@ -35,22 +35,26 @@ module YandexDirect
     @configuration = defined?(@environment) ? config[@environment] : config
   end
 
-  def self.request(service, method, params = {}, units = false)
+  def self.configure options
+    @configuration = options
+  end
+
+  def self.request(service, method, params = {}, units = false, config: @configuration)
     uri = URI(url + service)
     body = {
       method: method,
       params: params
     }
-    puts "\t\033[32mYandexDirect:\033[0m #{service}.#{method}(#{body[:params]})" if configuration['verbose'] && !units
+    puts "\t\033[32mYandexDirect:\033[0m #{service}.#{method}(#{body[:params]})" if config['verbose'] && !units
     
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     # http.set_debug_output($stdout) 
     request = Net::HTTP::Post.new(uri.path)
-    request['Authorization'] = "Bearer #{configuration['token']}"
-    request['Accept-Language'] = configuration['locale']
-    request['Client-Login'] = configuration['login'].downcase.gsub('.', '-')
+    request['Authorization'] = "Bearer #{config['token']}"
+    request['Accept-Language'] = config['locale']
+    request['Client-Login'] = config['login'].downcase.gsub('.', '-')
     request.body = JSON.generate(body)
 
     response = http.start do |http| 
@@ -93,3 +97,4 @@ require 'services/dictionaries.rb'
 require 'services/sitelink.rb'
 require 'services/vcard.rb'
 require 'live/live.rb'
+require 'client.rb'
