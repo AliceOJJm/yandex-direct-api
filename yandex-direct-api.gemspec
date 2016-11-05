@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.date = "2016-07-21"
   s.description = "Gem for interaction with Yandex Direct API version 5"
   s.email = "aliceo.jjm@gmail.com"
-  s.files = ["Rakefile", "lib/yandex_direct_api.rb"]
+  s.files = ["Rakefile", "lib/yandex-direct-api.rb"]
   s.homepage = "https://github.com/aliceojjm/yandex-direct-api"
   s.rubygems_version = "2.4.8"
   s.summary = "Gem for interaction with Yandex Direct API version 5"

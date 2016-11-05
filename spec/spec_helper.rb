@@ -1,2 +1,2 @@
 require 'pry'
-require 'yandex_direct_api'
+require 'yandex-direct-api'
