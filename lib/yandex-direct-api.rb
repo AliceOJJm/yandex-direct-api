@@ -13,11 +13,7 @@ module YandexDirect
   end
 
   def self.configuration
-    if defined? @environment
-      raise RuntimeError.new("Configure yandex-direct-api for #{@environment} environment.") unless @configuration
-    else
-      raise RuntimeError.new('Configure yandex-direct-api for current environment.') unless @configuration
-    end
+    raise RuntimeError.new("Configure yandex-direct-api for #{@environment || 'current'} environment.") unless @configuration
     @configuration
   end
 
@@ -39,7 +35,8 @@ module YandexDirect
     @configuration = options
   end
 
-  def self.request(service, method, params = {}, units = false, config: @configuration)
+  def self.request(service, method, params = {}, units = false, config: nil)
+    configure(config) if config.present?
     uri = URI(url + service)
     body = {
       method: method,

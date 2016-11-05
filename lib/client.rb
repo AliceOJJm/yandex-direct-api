@@ -20,6 +20,6 @@ class YandexDirect::Client
   end
 
   def request *args
-    YandexDirect.request(args, config: @configuration)
+    YandexDirect.request(*args, config: @configuration)
   end
 end
