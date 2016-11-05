@@ -1,7 +1,8 @@
 class YandexDirect::Sitelink
   SERVICE = 'sitelinks'
 
-  def initialize(@client)
+  def initialize(client)
+    @client = client
   end
   
   def add_set(params)

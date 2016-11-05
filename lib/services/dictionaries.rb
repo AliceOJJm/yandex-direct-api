@@ -1,7 +1,8 @@
 module YandexDirect::Dictionaries
   SERVICE = 'dictionaries'
 
-  def initialize(@client)
+  def initialize(client)
+    @client = client
   end
 
   def get_regions

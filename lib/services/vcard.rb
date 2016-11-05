@@ -1,7 +1,8 @@
 class YandexDirect::VCard
   SERVICE = 'vcards'
 
-  def initialize(@client)
+  def initialize(client)
+    @client = client
   end
 
   def get(ids = nil)

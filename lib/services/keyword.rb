@@ -1,7 +1,8 @@
 class YandexDirect::Keyword
   SERVICE = 'keywords'
 
-  def initialize(@client)
+  def initialize(client)
+    @client = client
   end
   
   def add(params)
