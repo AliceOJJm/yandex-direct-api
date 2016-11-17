@@ -24,7 +24,8 @@ class YandexDirect::Campaign
     if params.kind_of?(Array)
       batch_add(params)
     else
-      special_parameters = params.text_campaign_parameters if  params.type.blank? || params.type == "TEXT_CAMPAIGN"
+      params.type ||= "TEXT_CAMPAIGN"
+      special_parameters = params.text_campaign_parameters if params.type == "TEXT_CAMPAIGN"
       params.id = @client.request(SERVICE, 'add', {"Campaigns": [params.parameters(special_parameters)]})["AddResults"].first["Id"]
       params
     end
@@ -34,7 +35,8 @@ class YandexDirect::Campaign
     if params.kind_of?(Array)
       batch_update(params)
     else
-      special_parameters = params.text_campaign_parameters if params.type.blank? || params.type == "TEXT_CAMPAIGN"
+      params.type ||= "TEXT_CAMPAIGN"
+      special_parameters = params.text_campaign_parameters if params.type == "TEXT_CAMPAIGN"
       params.id = @client.request(SERVICE, 'update', {"Campaigns": [params.parameters(special_parameters)]})["UpdateResults"].first["Id"]
       params
     end
