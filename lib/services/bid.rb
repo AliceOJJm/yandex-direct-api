@@ -14,7 +14,7 @@ class YandexDirect::Bid
     @client.request(SERVICE, 'get', { 
       "SelectionCriteria": selection_criteria,
       "FieldNames": ["KeywordId", "AdGroupId", "CampaignId", "Bid", "ContextBid", "StrategyPriority", "CompetitorsBids", "SearchPrices", "ContextCoverage", "MinSearchPrice", "CurrentSearchPrice", "AuctionBids"]
-    })["Bids"] || []
+    })["Bids"].to_a
   end
 
   def set(bids)

@@ -1,8 +1,5 @@
 class YandexDirect::Campaign
   SERVICE = 'campaigns'
-  attr_accessor :name, :start_date, :time_zone, :id, :status, :state, :negative_keywords, :email, :owner_name, 
-                :search_strategy, :network_strategy, :limit_percent, :bid_percent, :end_date, :daily_budget_amount,
-                :daily_budget_mode, :blocked_ips, :excluded_sites, :type, :target_hours
 
   def initialize(client)
     @client = client
@@ -17,7 +14,7 @@ class YandexDirect::Campaign
       },
       "FieldNames": ['Id', 'Name', 'State', 'Status', 'TimeTargeting', 'NegativeKeywords', 'ClientInfo', 'Type'],
       "TextCampaignFieldNames": ["BiddingStrategy"]
-    })["Campaigns"]
+    })["Campaigns"].to_a
   end
 
   def add(params)
@@ -26,8 +23,7 @@ class YandexDirect::Campaign
     else
       params.type ||= "TEXT_CAMPAIGN"
       special_parameters = params.text_campaign_parameters if params.type == "TEXT_CAMPAIGN"
-      params.id = @client.request(SERVICE, 'add', {"Campaigns": [params.parameters(special_parameters)]})["AddResults"].first["Id"]
-      params
+      @client.request(SERVICE, 'add', {"Campaigns": [params.parameters(special_parameters)]})["AddResults"].first
     end
   end
 

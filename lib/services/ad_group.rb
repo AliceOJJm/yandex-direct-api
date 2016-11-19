@@ -1,6 +1,5 @@
 class YandexDirect::AdGroup
   SERVICE = 'adgroups'
-  attr_accessor :name, :campaign_id, :id, :status, :region_ids, :negative_keywords, :tracking_params
 
   def initialize(client)
     @client = client
@@ -10,19 +9,17 @@ class YandexDirect::AdGroup
     selection_criteria = {"Types":  ["TEXT_AD_GROUP"]}
     selection_criteria["CampaignIds"] = params[:campaign_ids] if params[:campaign_ids].present?
     selection_criteria["Ids"] = params[:ids] if params[:ids].present?
-    ad_groups = @client.request(SERVICE, 'get', { 
+    @client.request(SERVICE, 'get', { 
       "SelectionCriteria": selection_criteria,
       "FieldNames": ['Id', 'Name', 'CampaignId', 'Status', 'RegionIds', 'TrackingParams', 'NegativeKeywords']
-    })["AdGroups"]
-    ad_groups || []
+    })["AdGroups"].to_a
   end
 
   def add(params)
     if params.kind_of?(Array)
       batch_add(params)
     else
-      params.id = @client.request(SERVICE, 'add', {"AdGroups": [params.parameters]})["AddResults"].first["Id"]
-      params
+      @client.request(SERVICE, 'add', {"AdGroups": [parameters(params)]})["AddResults"].first
     end
   end
 
@@ -35,13 +32,13 @@ class YandexDirect::AdGroup
     end
   end
 
-  def parameters
-    hash = {"Name": @name,
-            "CampaignId": @campaign_id,
-            "RegionIds": @region_ids || [0],
-            "TrackingParams": @tracking_params
-          }
-    hash["NegativeKeywords"] = @negative_keywords if @negative_keywords.present?
+  def parameters(params)
+    hash = {  "Name": params[:name],
+              "CampaignId": params[:campaign_id],
+              "RegionIds": params[:region_ids] || [0]
+            }
+    hash["tracking_params"] = params[:tracking_params] if params[:tracking_params].present?
+    hash["NegativeKeywords"] = params[:negative_keywords] if params[:negative_keywords].present?
     hash
   end
 

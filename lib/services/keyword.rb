@@ -26,7 +26,7 @@ class YandexDirect::Keyword
     @client.request(SERVICE, 'get', { 
       "SelectionCriteria": selection_criteria,
       "FieldNames": ["Id", "Keyword", "State", "Status", "AdGroupId", "CampaignId", "Bid", "ContextBid"]
-    })["Keywords"] || []
+    })["Keywords"].to_a
   end
 
   def update(keywords)

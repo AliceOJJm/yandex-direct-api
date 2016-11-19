@@ -8,7 +8,7 @@ class YandexDirect::VCard
   def get(ids = nil)
     params = {"FieldNames": ["Id", "Country", "City", "Street", "House", "Building", "Apartment", "CompanyName", "ExtraMessage", "ContactPerson", "ContactEmail", "MetroStationId", "CampaignId", "Ogrn", "WorkTime", "InstantMessenger", "Phone", "PointOnMap"]}
     params["SelectionCriteria"] = {"Ids": ids} if ids.present?
-    @client.request(SERVICE, 'get', params)["VCards"] || []
+    @client.request(SERVICE, 'get', params)["VCards"].to_a
   end
 
   def add(params)

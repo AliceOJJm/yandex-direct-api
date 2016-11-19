@@ -12,22 +12,18 @@ class YandexDirect::Add
     selection_criteria["CampaignIds"] = params[:campaign_ids] if params[:campaign_ids].present?
     selection_criteria["AdGroupIds"] = params[:ad_group_ids] if params[:ad_group_ids].present?
     selection_criteria["Ids"] = params[:ids] if params[:ids].present?
-    ads = @client.request(SERVICE, 'get', { 
+    @client.request(SERVICE, 'get', { 
       "SelectionCriteria": selection_criteria,
       "FieldNames": ['AdGroupId', 'CampaignId', 'State', 'Status', 'StatusClarification', 'Type', 'Id'],
       "TextAdFieldNames": ['SitelinkSetId', 'Text', 'Title', 'Href']
-    })["Ads"]
-    ads || []
+    })["Ads"].to_a
   end
 
   def add(params)
     if params.kind_of?(Array)
       batch_add(params)
     else
-      params['type'] ||= 'TextAd'
-      parameters = add_parameters(params)
-      params.id = @client.request(SERVICE, 'add', {"Ads": [parameters]})["AddResults"].first["Id"]
-      params
+      @client.request(SERVICE, 'add', {"Ads": [params]})["AddResults"].first
     end
   end
 
@@ -36,8 +32,7 @@ class YandexDirect::Add
       batch_update(params)
     else
       params['type'] ||= 'TextAd'
-      parameters = add_parameters(params)
-      params.id = @client.request(SERVICE, 'update', {"Ads": [parameters]})["UpdateResults"].first["Id"]
+      params.id = @client.request(SERVICE, 'update', {"Ads": [params]})["UpdateResults"].first["Id"]
       params
     end
   end
@@ -70,11 +65,6 @@ class YandexDirect::Add
   def delete(ids)
     ids = [ids] unless ids.kind_of?(Array)
     action('delete', ids)
-  end
-
-  def add_parameters(params)
-    type = params.delete('type')
-    {type => params}
   end
 
   def update_parameters(add_type)
